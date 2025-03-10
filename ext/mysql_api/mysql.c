@@ -273,7 +273,8 @@ static VALUE real_connect(int argc, VALUE* argv, VALUE klass)
     rb_thread_start_timer();
 #endif
 
-    myp->handler.reconnect = 0;
+    my_bool recon = reconnect;
+    mysql_options(&myp->handler, MYSQL_OPT_RECONNECT, &recon);
     myp->connection = Qtrue;
     myp->query_with_result = Qtrue;
     rb_obj_call_init(obj, argc, argv);
@@ -347,7 +348,8 @@ static VALUE real_connect2(int argc, VALUE* argv, VALUE obj)
 #ifdef HAVE_RB_THREAD_START_TIMER
     rb_thread_start_timer();
 #endif
-    m->reconnect = 0;
+    my_bool recon = reconnect;
+    mysql_options(m, MYSQL_OPT_RECONNECT, &recon);
     GetMysqlStruct(obj)->connection = Qtrue;
 
     return obj;
@@ -920,13 +922,17 @@ static VALUE query_with_result_set(VALUE obj, VALUE flag)
 /*	reconnect()	*/
 static VALUE reconnect(VALUE obj)
 {
-    return GetHandler(obj)->reconnect ? Qtrue : Qfalse;
+    my_bool recon;
+    mysql_get_option(GetHandler(obj), MYSQL_OPT_RECONNECT, &recon);
+    return recon ? Qtrue : Qfalse;
 }
 
 /*	reconnect=(flag)	*/
 static VALUE reconnect_set(VALUE obj, VALUE flag)
 {
-    GetHandler(obj)->reconnect = (flag == Qnil || flag == Qfalse) ? 0 : 1;
+    my_bool recon;
+    recon = (flag == Qnil || flag == Qfalse) ? 0 : 1;
+    mysql_options(GetHandler(obj), MYSQL_OPT_RECONNECT, &recon);
     return flag;
 }
 
