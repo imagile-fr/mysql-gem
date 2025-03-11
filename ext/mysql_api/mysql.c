@@ -273,7 +273,7 @@ static VALUE real_connect(int argc, VALUE* argv, VALUE klass)
     rb_thread_start_timer();
 #endif
 
-    my_bool recon = reconnect;
+    my_bool recon = 0;
     mysql_options(&myp->handler, MYSQL_OPT_RECONNECT, &recon);
     myp->connection = Qtrue;
     myp->query_with_result = Qtrue;
@@ -348,7 +348,7 @@ static VALUE real_connect2(int argc, VALUE* argv, VALUE obj)
 #ifdef HAVE_RB_THREAD_START_TIMER
     rb_thread_start_timer();
 #endif
-    my_bool recon = reconnect;
+    my_bool recon = 0;
     mysql_options(m, MYSQL_OPT_RECONNECT, &recon);
     GetMysqlStruct(obj)->connection = Qtrue;
 
